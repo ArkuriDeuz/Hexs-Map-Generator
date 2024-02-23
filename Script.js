@@ -33,8 +33,8 @@ const tileSet = [
     { nombre: 'A31', set: [0, 1, 2, 3, 2, 0], clase: 'Fort' },
     { nombre: 'A32', set: [0, 0, 1, 0, 0, 0], clase: 'Fort' },
     { nombre: 'A33', set: [1, 0, 0, 0, 0, 0], clase: 'Fort' },
-    { nombre: 'A34', set: [4, 4, 1, 4, 4, 4], clase: 'Fort' },
-    { nombre: 'A35', set: [0, 1, 0, 4, 4, 4], clase: 'Fort' },
+    { nombre: 'A34', set: [0, 0, 1, 0, 0, 0], clase: 'Fort' },
+    { nombre: 'A35', set: [0, 1, 0, 0, 0, 0], clase: 'Fort' },
     { nombre: 'A36', set: [2, 3, 2, 1, 0, 0], clase: 'Fort' },
     { nombre: 'A37', set: [1, 0, 0, 1, 0, 0], clase: 'Fort' },
     { nombre: 'A38', set: [1, 1, 0, 1, 0, 0], clase: 'Fort' },
@@ -111,8 +111,9 @@ function getOppositeShift(shiftsArray, index) {
     // Ajustar el índice sumando o restando 3
     index = (index + 3) % 6;
     // Retornar el valor del array en el nuevo índice
-    console.log(shiftsArray[index]);
-    return shiftsArray[index];
+    const oppositeShift = shiftsArray[index];
+    console.log(`Valor obtenido en getOppositeShift: ${oppositeShift}`);
+    return oppositeShift;
 }
 
 function getTileAtPosition(row, col) {
@@ -120,8 +121,6 @@ function getTileAtPosition(row, col) {
     console.log(col);*/
     return modifiedTilesArray.find(tile => tile.fila === row && tile.columna === col);
 }
-// Imprimir el array con los resultados válidos en consola
-console.log(validTiles);
 
 const mapContainer = document.getElementById('map-container');
 const generateButton = document.getElementById('generate-button');
@@ -134,21 +133,15 @@ const mapSizeRows = mapSizeColumns / 2; // La mitad de filas
 const modifiedTilesArray = []; // Array para almacenar los objetos modifiedTile
 
 function loadAllImages() {
-    let index;
-    let isFirstIteration = true;
+    let index = 0;
 
     for (let row = 0; row < mapSizeRows; row++) {
         for (let col = 0; col < mapSizeColumns; col++) {
+            console.log(`Esta es la iteración número: ${index} **************************************`);
             const hexTile = document.createElement('div');
             hexTile.className = 'hex-tile';
 
-            console.log(patternToMatch);
-            if (!isFirstIteration) {
-                updatePattern(modifiedTilesArray.length - 1); // Actualizar el patrón antes de la segunda iteración
-            }
-
             findValidTilesAndUpdatePattern();
-            console.log(patternToMatch);
             const randomValidTile = validTiles[Math.floor(Math.random() * validTiles.length)];
 
             const modifiedTile = {
@@ -189,13 +182,14 @@ function loadAllImages() {
 
             mapContainer.appendChild(hexTile);
 
-            console.log(validTiles);
             console.log(patternToMatch);
+            updatePattern(modifiedTilesArray.length - 1); // Actualizar el patrón antes de la segunda iteración
+            console.log(patternToMatch);
+
+            //console.log(validTiles);
+            //console.log(patternToMatch);
             console.log(modifiedTilesArray);
             
-            if (isFirstIteration) {
-                isFirstIteration = false;
-            }
             index++;
         }
     }
@@ -203,42 +197,49 @@ function loadAllImages() {
 
 function updatePattern(index) { 
     const modifiedTile = modifiedTilesArray[index]; 
-    //console.log(`Fila original: ${modifiedTile.fila}, Columna original: ${modifiedTile.columna}`);
-
+    console.log(`Fila original: ${modifiedTile.fila}, Columna original: ${modifiedTile.columna}`);
+    // Calcular la fila y columna de la próxima posición donde se colocará el tile
+    const nextRow = modifiedTile.columna === mapSizeColumns ? modifiedTile.fila + 1 : modifiedTile.fila;
+    const nextCol = modifiedTile.columna === mapSizeColumns ? 1 : modifiedTile.columna + 1;
+    console.log(`Fila próxima: ${nextRow}, Columna próxima: ${nextCol}`);
 
     // Determinar si la fila es par o impar
-    const isEvenRow = modifiedTile.fila % 2 === 0;
+    const isEvenRow = nextRow % 2 === 0;
+    console.log(`Próxima fila: ${nextRow}`);
     // Definir las direcciones según si la fila es par o impar
     const directions = isEvenRow ? [
-        { name: 'norEste', row: modifiedTile.fila - 1, col: modifiedTile.columna },
-        { name: 'este', row: modifiedTile.fila, col: modifiedTile.columna + 1 },
-        { name: 'surEste', row: modifiedTile.fila + 1, col: modifiedTile.columna },
-        { name: 'surOeste', row: modifiedTile.fila + 1, col: modifiedTile.columna - 1 },
-        { name: 'oeste', row: modifiedTile.fila, col: modifiedTile.columna - 1 },
-        { name: 'norOeste', row: modifiedTile.fila - 1, col: modifiedTile.columna - 1 }
+        { name: 'norEste2', row: nextRow - 1, col: nextCol },
+        { name: 'este2', row: nextRow, col: nextCol + 1 },
+        { name: 'surEste2', row: nextRow + 1, col: nextCol },
+        { name: 'surOeste2', row: nextRow + 1, col: nextCol - 1 },
+        { name: 'oeste2', row: nextRow, col: nextCol - 1 },
+        { name: 'norOeste2', row: nextRow - 1, col: nextCol - 1 }
     ] : [
-        { name: 'norEste', row: modifiedTile.fila - 1, col: modifiedTile.columna + 1 },
-        { name: 'este', row: modifiedTile.fila, col: modifiedTile.columna + 1 },
-        { name: 'surEste', row: modifiedTile.fila + 1, col: modifiedTile.columna + 1 },
-        { name: 'surOeste', row: modifiedTile.fila + 1, col: modifiedTile.columna },
-        { name: 'oeste', row: modifiedTile.fila, col: modifiedTile.columna - 1 },
-        { name: 'norOeste', row: modifiedTile.fila - 1, col: modifiedTile.columna }
+        { name: 'norEste1', row: nextRow - 1, col: nextCol + 1 },
+        { name: 'este1', row: nextRow, col: nextCol + 1 },
+        { name: 'surEste1', row: nextRow + 1, col: nextCol + 1 },
+        { name: 'surOeste1', row: nextRow + 1, col: nextCol - 1 },
+        { name: 'oeste1', row: nextRow, col: nextCol - 1 },
+        { name: 'norOeste1', row: nextRow - 1, col: nextCol}
     ];
 
     let indexPattern = 0; 
     directions.forEach(direction => {
-        const { row, col } = direction;
-        //console.log(`Fila modificada: ${row}, Columna modificada: ${col}`);
-        if (row <= 0 || row >= mapSizeRows || col <= 0 || col >= mapSizeColumns) {
+        const { name, row, col } = direction;
+        console.log(`Dirección: ${name}`);
+        console.log(`Fila modificada: ${row}, Columna modificada: ${col}`);
+        if (row <= 0 || row > mapSizeRows || col <= 0 || col > mapSizeColumns) {
             patternToMatch[indexPattern] = 0; 
         } else {
             const tile = getTileAtPosition(row, col); 
-            //console.log(tile);
+            console.log(tile);
             if (!tile) {
                 patternToMatch[indexPattern] = 'x'; 
             } else {
                 const tileValue = tile.set[getOppositeShift(tile.set, indexPattern)];
-                patternToMatch[indexPattern] = tileValue !== 'x' ? tileValue : 'x';
+                patternToMatch[indexPattern] = getOppositeShift(tile.set, indexPattern);
+                console.log(tileValue);
+                console.log(getOppositeShift(tile.set, indexPattern)); // Console log agregado aquí
             }
         }
         //console.log(indexPattern);
